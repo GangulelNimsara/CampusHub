@@ -1,6 +1,24 @@
-﻿var phoneInstance = null;
+﻿// Global Variables & Alert Mixin
+var phoneInstance = null;
 
-// DOM Initialization & Event Listeners
+const CampusAlert = Swal.mixin({
+  customClass: {
+    popup: 'border border-2 border-dark rounded-4 shadow-lg bg-white p-4',
+    title: 'fw-bold text-dark fs-4 mb-2',
+    htmlContainer: 'text-secondary small mb-3',
+    confirmButton: 'btn btn-primary rounded-pill px-4 me-2 fw-semibold',
+    cancelButton: 'btn btn-outline-dark rounded-pill px-4 fw-semibold',
+    denyButton: 'btn btn-danger rounded-pill px-4 me-2 fw-semibold'
+  },
+  buttonsStyling: false,
+  background: '#ffffff'
+});
+
+// Gallery Modal State
+window.galleryItems = window.galleryItems || [];
+var currentGalleryIndex = 0;
+
+// DOM Initialization
 document.addEventListener("DOMContentLoaded", () => {
   phoneInstance = initializeMobileInput();
 
@@ -71,9 +89,36 @@ document.addEventListener("DOMContentLoaded", () => {
       otpInputs[focusIndex].focus();
     }
   }
+
+  // Initialize FullCalendar
+  var calendarEl = document.getElementById('calendar');
+  if (calendarEl && typeof FullCalendar !== "undefined") {
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next',
+        center: 'title',
+        right: 'today'
+      },
+      height: 320,
+      contentHeight: 280,
+      aspectRatio: 1.35,
+      fixedWeekCount: false,
+      eventDisplay: 'block',
+      events: 'getEventsProcess.php',
+      eventDidMount: function (info) {
+        if (info.event.extendedProps.description) {
+          info.el.setAttribute('title', info.event.title + ' (' + info.event.extendedProps.description + ')');
+        } else {
+          info.el.setAttribute('title', info.event.title);
+        }
+      }
+    });
+    calendar.render();
+  }
 });
 
-// Mobile Input Initialization
+// Mobile Input Setup
 function initializeMobileInput() {
   const mobileInput = document.getElementById("mobile");
   if (!mobileInput) return null;
@@ -84,12 +129,11 @@ function initializeMobileInput() {
     nationalMode: false,
     autoHideDialCode: false,
     formatOnDisplay: true,
-    utilsScript:
-      "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
   });
 }
 
-// User Registration Handler
+// Authentication Handlers
 function registerProcess() {
   var username = document.getElementById("username").value.trim();
   var firstName = document.getElementById("firstName").value.trim();
@@ -114,11 +158,24 @@ function registerProcess() {
   var request = new XMLHttpRequest();
   request.onreadystatechange = function () {
     if (request.readyState == 4 && request.status == 200) {
-      reponse = request.responseText.trim();
-      if(response == "Username, email, or mobile number already exists"){
-         alert (response);
-      }else{
-        window.location.heref ="login.php";
+      var response = request.responseText.trim();
+
+      if (response === "success") {
+        CampusAlert.fire({
+          icon: 'success',
+          title: 'Account Created! 🎉',
+          text: 'Your registration was successful. You can now log in.',
+          confirmButtonText: 'Go to Login 🚀'
+        }).then(() => {
+          window.location.href = "login.php";
+        });
+      } else {
+        CampusAlert.fire({
+          icon: 'warning',
+          title: 'Registration Notice',
+          text: response,
+          confirmButtonText: 'Got it'
+        });
       }
     }
   };
@@ -127,7 +184,6 @@ function registerProcess() {
   request.send(form);
 }
 
-// User Login Handler
 function loginProcess() {
   var username = document.getElementById("username").value.trim();
   var password = document.getElementById("password").value.trim();
@@ -142,11 +198,24 @@ function loginProcess() {
       var response = request.responseText.trim();
 
       if (response === "user_not_found") {
-        window.location.href = "register.php";
+        CampusAlert.fire({
+          icon: 'info',
+          title: 'Account Not Found',
+          text: 'No account exists with these credentials. Redirecting to registration...',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = "register.php";
+        });
       } else if (response === "success") {
         window.location.href = "dashboard.php";
       } else {
-        alert(response);
+        CampusAlert.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: response,
+          confirmButtonText: 'Try Again'
+        });
       }
     }
   };
@@ -155,7 +224,6 @@ function loginProcess() {
   request.send(form);
 }
 
-// Forgot Password Handler
 function forgetPassword() {
   var email = document.getElementById("email").value.trim();
   var forgetBtn = document.getElementById("forgetBtn");
@@ -163,11 +231,15 @@ function forgetPassword() {
   var btnSpinner = document.getElementById("btnSpinner");
 
   if (!email) {
-    alert("Please enter your email address.");
+    CampusAlert.fire({
+      icon: 'warning',
+      title: 'Email Required',
+      text: 'Please enter your registered email address.',
+      confirmButtonText: 'OK'
+    });
     return;
   }
 
-  
   forgetBtn.disabled = true;
   btnText.textContent = "Sending...";
   btnSpinner.classList.remove("d-none");
@@ -178,7 +250,6 @@ function forgetPassword() {
   var request = new XMLHttpRequest();
   request.onreadystatechange = function () {
     if (request.readyState == 4) {
-     
       btnText.textContent = "Send Reset Code";
       btnSpinner.classList.add("d-none");
 
@@ -186,12 +257,29 @@ function forgetPassword() {
         var response = request.responseText.trim();
 
         if (response === "success") {
-          window.location.href = "resetPassword.php";
+          CampusAlert.fire({
+            icon: 'success',
+            title: 'Code Sent! 📧',
+            text: 'A verification code has been sent to your email.',
+            confirmButtonText: 'Enter Code'
+          }).then(() => {
+            window.location.href = "resetPassword.php";
+          });
         } else {
-          alert(response);
+          CampusAlert.fire({
+            icon: 'error',
+            title: 'Request Failed',
+            text: response,
+            confirmButtonText: 'OK'
+          });
         }
       } else {
-        alert("An error occurred while sending the email. Please try again.");
+        CampusAlert.fire({
+          icon: 'error',
+          title: 'Server Error',
+          text: 'An error occurred while sending the email. Please try again.',
+          confirmButtonText: 'OK'
+        });
       }
     }
   };
@@ -200,7 +288,6 @@ function forgetPassword() {
   request.send(form);
 }
 
-// Reset Password Handler
 function resetPasswordProcess() {
   const inputs = document.querySelectorAll("#otpInputs input");
   var verificationCode = "";
@@ -212,12 +299,22 @@ function resetPasswordProcess() {
   var confirmPassword = document.getElementById("confirmPassword").value.trim();
 
   if (verificationCode.length !== 8) {
-    alert("Please enter the complete 8-digit verification code.");
+    CampusAlert.fire({
+      icon: 'warning',
+      title: 'Invalid Code',
+      text: 'Please enter the full 8-digit verification code.',
+      confirmButtonText: 'OK'
+    });
     return;
   }
 
   if (password !== confirmPassword) {
-    alert("Passwords do not match.");
+    CampusAlert.fire({
+      icon: 'warning',
+      title: 'Password Mismatch',
+      text: 'New password and confirmation password do not match.',
+      confirmButtonText: 'OK'
+    });
     return;
   }
 
@@ -231,14 +328,219 @@ function resetPasswordProcess() {
     if (request.readyState == 4 && request.status == 200) {
       var response = request.responseText.trim();
       if (response === "success") {
-        alert("Password updated successfully!");
-        window.location.href = "login.php";
+        CampusAlert.fire({
+          icon: 'success',
+          title: 'Password Updated! 🔒',
+          text: 'Your password has been reset successfully.',
+          confirmButtonText: 'Login Now'
+        }).then(() => {
+          window.location.href = "login.php";
+        });
       } else {
-        alert(response);
+        CampusAlert.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response,
+          confirmButtonText: 'OK'
+        });
       }
     }
   };
 
   request.open("POST", "resetPasswordProcess.php", true);
   request.send(form);
+}
+
+// Event Actions
+function registerForEvent(eventId) {
+  window.location.href = "eventRegister.php?event_id=" + eventId;
+}
+
+function registerEvent() {
+  const form = document.getElementById("registrationMenuForm");
+  if (!form) return;
+
+  const formData = new FormData(form);
+
+  fetch("eventRegisterProcess.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(response => response.text())
+    .then(data => {
+      const result = data.trim();
+
+      if (result === "success") {
+        CampusAlert.fire({
+          icon: "success",
+          title: "Registration Confirmed! 🎉",
+          text: "Attendance registration was successful.",
+          confirmButtonText: "Go to Dashboard 🚀"
+        }).then(() => {
+          window.location.href = "dashboard.php";
+        });
+      } else if (result === "already_registered") {
+        CampusAlert.fire({
+          icon: "warning",
+          title: "Already Registered",
+          text: "This attendee is already registered for this event.",
+          confirmButtonText: "Got it"
+        });
+      } else if (result === "login_required") {
+        window.location.href = "login.php";
+      } else {
+        CampusAlert.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: result,
+          confirmButtonText: "Try Again"
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+}
+
+// Gallery Lightbox & Navigation
+function openImagePreview(index) {
+  if (!window.galleryItems || window.galleryItems.length === 0) return;
+  currentGalleryIndex = index;
+  updateModalContent();
+
+  var modalElem = document.getElementById('imagePreviewModal');
+  if (modalElem) {
+    var previewModal = bootstrap.Modal.getInstance(modalElem) || new bootstrap.Modal(modalElem);
+    previewModal.show();
+  }
+}
+
+function updateModalContent() {
+  const imgElement = document.getElementById('imagePreviewSrc');
+  const titleElement = document.getElementById('imagePreviewTitle');
+  if (imgElement && window.galleryItems[currentGalleryIndex]) {
+    imgElement.src = window.galleryItems[currentGalleryIndex].src;
+  }
+  if (titleElement && window.galleryItems[currentGalleryIndex]) {
+    titleElement.textContent = window.galleryItems[currentGalleryIndex].title || 'Image Preview';
+  }
+}
+
+function prevImage() {
+  if (!window.galleryItems || window.galleryItems.length === 0) return;
+  currentGalleryIndex = (currentGalleryIndex - 1 + window.galleryItems.length) % window.galleryItems.length;
+  updateModalContent();
+}
+
+function nextImage() {
+  if (!window.galleryItems || window.galleryItems.length === 0) return;
+  currentGalleryIndex = (currentGalleryIndex + 1) % window.galleryItems.length;
+  updateModalContent();
+}
+// Submit Feedback from eventRegister.php
+function submitEventFeedback() {
+  const messageInput = document.getElementById("eventFeedbackMessage");
+  if (!messageInput) return;
+
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    CampusAlert.fire({
+      icon: "warning",
+      title: "Empty Message",
+      text: "Please enter your feedback before submitting.",
+      confirmButtonText: "OK"
+    });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("message", message);
+
+  fetch("submitFeedbackProcess.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(response => response.text())
+    .then(data => {
+      const result = data.trim();
+      if (result === "success") {
+        CampusAlert.fire({
+          icon: "success",
+          title: "Feedback Sent! 💬",
+          text: "Thank you! Your feedback has been sent to the administrators.",
+          confirmButtonText: "Great"
+        });
+        messageInput.value = "";
+      } else if (result === "login_required") {
+        window.location.href = "login.php";
+      } else {
+        CampusAlert.fire({
+          icon: "error",
+          title: "Submission Failed",
+          text: result,
+          confirmButtonText: "Try Again"
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+}
+
+// Submit Feedback from dashboard.php Modal
+function submitDashboardFeedback() {
+  const messageInput = document.getElementById("dashboardFeedbackMessage");
+  if (!messageInput) return;
+
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    CampusAlert.fire({
+      icon: "warning",
+      title: "Empty Message",
+      text: "Please enter your feedback before submitting.",
+      confirmButtonText: "OK"
+    });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("message", message);
+
+  fetch("submitFeedbackProcess.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(response => response.text())
+    .then(data => {
+      const result = data.trim();
+      if (result === "success") {
+        const modalElem = document.getElementById('dashboardFeedbackModal');
+        if (modalElem) {
+          const modalInstance = bootstrap.Modal.getInstance(modalElem);
+          if (modalInstance) modalInstance.hide();
+        }
+
+        CampusAlert.fire({
+          icon: "success",
+          title: "Feedback Sent! 💬",
+          text: "Thank you! Your feedback has been submitted successfully.",
+          confirmButtonText: "Great"
+        });
+        messageInput.value = "";
+      } else if (result === "login_required") {
+        window.location.href = "login.php";
+      } else {
+        CampusAlert.fire({
+          icon: "error",
+          title: "Submission Failed",
+          text: result,
+          confirmButtonText: "Try Again"
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
 }

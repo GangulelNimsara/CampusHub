@@ -2,13 +2,19 @@
 
 require "includes/db.php";
 
-$username = $_POST['username'];
-$firstName = $_POST['firstName'];
-$lastName = $_POST['lastName'];
-$password = $_POST['password'];
-$confirmPassword = $_POST['confirmPassword'];
-$email = $_POST['email'];
-$mobile = $_POST['mobile'];
+$username = $_POST['username'] ?? '';
+$firstName = $_POST['firstName'] ?? '';
+$lastName = $_POST['lastName'] ?? '';
+$password = $_POST['password'] ?? '';
+$confirmPassword = $_POST['confirmPassword'] ?? '';
+$email = $_POST['email'] ?? '';
+$mobile = $_POST['mobile'] ?? '';
+
+function generateStudentID(int $lastInsertedId, string $prefix = 'STU', int $paddingLength = 5): string {
+    $currentYear = date("Y");
+    $paddedSequence = str_pad($lastInsertedId, $paddingLength, '0', STR_PAD_LEFT);
+    return "{$prefix}-{$currentYear}-{$paddedSequence}";
+}
 
 function invalidPassword($password){
     $uppercase = preg_match('@[A-Z]@', $password);
@@ -61,7 +67,7 @@ if(empty($username) || empty($firstName) || empty($lastName) || empty($password)
     echo "Please enter valid mobile number";
 }else {
     $result = Database::search("SELECT * FROM `users` WHERE `username` = '".$username."' OR `email` = '".$email."' OR `mobile` = '".$mobile."'");
-    if($result->num_rows > 0){
+    if($result && $result->num_rows > 0){
         echo "Username, email, or mobile number already exists";
     }else{
 
@@ -70,7 +76,16 @@ if(empty($username) || empty($firstName) || empty($lastName) || empty($password)
         $date->setTimezone($timeZone);
         $formattedDate = $date->format("Y-m-d");
 
-        Database::iud("INSERT INTO `users` (`role_id`, `status_id`, `username`, `first_name`, `last_name`, `email`, `mobile`, `password`, `joined_date`) VALUES (2, 1, '".$username."', '".$firstName."', '".$lastName."', '".$email."', '".$mobile."', '".$password."', '".$formattedDate."')");
+        $idResult = Database::search("SELECT `id` FROM `users` ORDER BY `id` DESC LIMIT 1");
+        $nextId = 1;
+        if($idResult && $idResult->num_rows > 0){
+            $lastRow = $idResult->fetch_assoc();
+            $nextId = (int)$lastRow['id'] + 1;
+        }
+
+        $studentId = generateStudentID($nextId);
+
+        Database::iud("INSERT INTO `users` (`status_id`, `studentId`, `username`, `first_name`, `last_name`, `email`, `mobile`, `password`, `joined_date`) VALUES ('1', '".$studentId."', '".$username."', '".$firstName."', '".$lastName."', '".$email."', '".$mobile."', '".$password."', '".$formattedDate."')");
         echo "success";
     }
 }

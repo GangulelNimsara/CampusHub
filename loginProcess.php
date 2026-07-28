@@ -7,7 +7,6 @@ include "includes/db.php";
 $usr = $_POST['username'] ?? '';
 $pwd = $_POST['password'] ?? '';
 
-
 if (empty($usr) && empty($pwd)) {
     echo "Please fill all the fields";
 } else if (empty($usr)) {
@@ -20,19 +19,16 @@ if (empty($usr) && empty($pwd)) {
     echo "Password should be at least 8 characters";
 } else {
 
-   
     $result = Database::search("SELECT * FROM `users` WHERE `username` = '".$usr."'");
 
     if ($result && $result->num_rows > 0) {
         $data = $result->fetch_assoc();
-   
+
         if ($pwd !== $data['password']) {
             echo "Invalid Password";
         } else {
-            $_SESSION["usr"] = $data['username'];
-            $_SESSION["pwd"] = $data['password'];
+            $_SESSION["user"] = $data;
             echo "success";
-            
         }
     } else {
         echo "user_not_found";

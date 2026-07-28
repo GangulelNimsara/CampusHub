@@ -6,50 +6,49 @@ body {
     scroll-behavior: smooth;
 }
 
-.split-bg {
-    background-image: url("../images/splitImg.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    width: 100%;
-    height: 100%;
+body {
+    padding-top: 0;
 }
 
-.slide-arrow-btn {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 30px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+.text-orange {
+    color: orange;
 }
 
-.slide-arrow-btn .arrow-icon-right,
-.slide-arrow-btn .arrow-icon-left {
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.navbar {
+    background: #fff;
+    transition: .3s;
+    z-index: 1050;
 }
 
-.slide-arrow-btn:hover {
-    background: rgba(0, 0, 0, 0.65);
-    border-color: rgba(255, 255, 255, 0.6);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+.navbar-brand img {
+    transition: .3s;
 }
 
-.slide-arrow-btn:hover .arrow-icon-right {
-    transform: translateX(4px);
+.navbar-brand:hover img {
+    transform: scale(1.03);
 }
 
-.slide-arrow-btn:hover .arrow-icon-left {
-    transform: translateX(-4px);
+.navbar-nav .nav-link {
+    color: #222 !important;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: .3s;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #0d6efd !important;
 }
 
 .animation-hover {
-    transition: .3s;
     display: flex;
     align-items: center;
+    justify-content: center;
     font-weight: 500;
+    color: #000;
+    text-decoration: none;
+    transition: .3s;
 }
 
 .animation-hover .svg {
@@ -58,12 +57,21 @@ body {
 
 .animation-hover:hover {
     background: #19d6cd;
-    color: white !important;
+    color: #fff !important;
+    border-color: #19d6cd !important;
 }
 
 .animation-hover:hover .svg {
-    transform: translateX(4px);
     filter: brightness(0) invert(1);
+    transform: translateX(4px);
+}
+
+.rounded-circle img {
+    transition: .3s;
+}
+
+.rounded-circle:hover img {
+    transform: scale(1.08);
 }
 
 .form-control {
@@ -75,15 +83,49 @@ body {
     box-shadow: 0 0 8px rgba(13,110,253,.25);
 }
 
+.split-bg {
+    background-image: url("../images/splitImg.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    min-height: 100%;
+}
+
+.slide-arrow-btn {
+    background: rgba(0,0,0,.4);
+    backdrop-filter: blur(12px);
+    border-radius: 30px;
+    transition: .3s;
+}
+
+.slide-arrow-btn:hover {
+    background: rgba(0,0,0,.65);
+    transform: translateY(-2px);
+}
+
+.arrow-icon-right,
+.arrow-icon-left {
+    transition: .3s;
+}
+
+.slide-arrow-btn:hover .arrow-icon-right {
+    transform: translateX(4px);
+}
+
+.slide-arrow-btn:hover .arrow-icon-left {
+    transform: translateX(-4px);
+}
+
 .page-enter-right {
-    animation: slideInRight .45s ease;
+    animation: slideRight .45s ease;
 }
 
 .page-enter-left {
-    animation: slideInLeft .45s ease;
+    animation: slideLeft .45s ease;
 }
 
-@keyframes slideInRight {
+@keyframes slideRight {
     from {
         opacity: 0;
         transform: translateX(25px);
@@ -94,7 +136,7 @@ body {
     }
 }
 
-@keyframes slideInLeft {
+@keyframes slideLeft {
     from {
         opacity: 0;
         transform: translateX(-25px);
@@ -105,65 +147,174 @@ body {
     }
 }
 
-@media (max-width:991px){
-    body{
-        overflow-y:auto;
-    }
-}
-
 .iti {
-    width: 100% !important;
-    display: block !important;
+    width: 100%;
 }
 
-.iti input, .iti input[type=text], .iti input[type=tel] {
-    padding-top: 0.375rem !important;
-    padding-bottom: 0.375rem !important;
+.iti input {
+    width: 100%;
     padding-left: 95px !important;
-    height: calc(1.5em + 0.75rem + 2px) !important;
-    border-radius: 0.375rem !important;
-    border: 1px solid #ced4da !important;
-    transition: all 0.3s ease-in-out !important;
-    width: 100% !important;
-}
-
-.iti input:focus {
-    border-color: #0d6efd !important;
-    box-shadow: 0 0 8px rgba(13, 110, 253, 0.25) !important;
-    outline: none !important;
-}
-
-.iti__flag-container {
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-}
-
-.iti__selected-flag {
-    background-color: transparent !important;
-    padding: 0 10px !important;
-    border-top-left-radius: 0.375rem;
-    border-bottom-left-radius: 0.375rem;
 }
 
 .iti__country-list {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    border-radius: 0.375rem !important;
-    background-color: #ffffff !important;
+    border-radius: 8px;
 }
-.otp-input {
-            width: 42px;
-            height: 50px;
-            text-align: center;
-            font-size: 1.25rem;
-            font-weight: bold;
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-        }
 
-        .otp-input:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-            outline: none;
-        }
+.otp-input {
+    width: 45px;
+    height: 50px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.otp-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 8px rgba(13,110,253,.25);
+}
+
+@media (max-width:991.98px) {
+    body {
+        padding-top: 70px;
+    }
+
+    .navbar-brand img {
+        max-height: 55px !important;
+    }
+
+    .navbar-nav {
+        gap: 8px;
+    }
+
+    .animation-hover {
+        width: 100%;
+    }
+
+    .split-bg {
+        min-height: 300px;
+    }
+}
+
+@media (min-width:992px) {
+    .navbar-nav {
+        align-items: center;
+    }
+
+    .navbar-collapse {
+        justify-content: space-between;
+    }
+
+    .main-container {
+        height: calc(100vh - 76px);
+    }
+}
+
+.dashboard-container {
+    padding-top: 5rem !important;
+}
+
+.section-header-wrapper {
+    max-width: 700px;
+}
+
+.event-card-img {
+    height: 180px;
+    object-fit: cover;
+}
+
+.extra-small {
+    font-size: 0.75rem;
+}
+
+.dashboard-calendar-compact {
+    height: 320px;
+    overflow: hidden;
+}
+
+.dashboard-calendar-compact .fc {
+    font-size: 0.75rem;
+}
+
+.dashboard-calendar-compact .fc-toolbar-title {
+    font-size: 0.95rem !important;
+    font-weight: 700;
+}
+
+.dashboard-calendar-compact a,
+.fc a {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+.dashboard-calendar-compact .fc-button {
+    background-color: transparent !important;
+    border: none !important;
+    color: #212529 !important;
+    box-shadow: none !important;
+    opacity: 0.5;
+    transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+}
+
+.dashboard-calendar-compact .fc-button:hover {
+    opacity: 1 !important;
+    background-color: #e9ecef !important;
+    color: #0d6efd !important;
+}
+
+.dashboard-calendar-compact .fc-button:focus {
+    box-shadow: none !important;
+}
+
+.dashboard-calendar-compact .fc-daygrid-day-frame {
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 1px !important;
+    overflow: hidden;
+}
+
+.dashboard-calendar-compact .fc-scroller {
+    overflow: hidden !important;
+}
+
+.dashboard-calendar-compact .fc-day-today {
+    background-color: #e7f1ff !important;
+}
+
+.dashboard-calendar-compact .fc-daygrid-event-harness {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-calendar-compact .fc-daygrid-dot-event {
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 1px auto 0 auto !important;
+    cursor: pointer;
+}
+
+.dashboard-calendar-compact .fc-daygrid-event-dot {
+    border-color: #0d6efd !important;
+    border-width: 4px !important;
+    margin: 0 !important;
+}
+
+.dashboard-calendar-compact .fc-event-title {
+    display: none !important;
+}
+
+.highlight-event-date {
+    background-color: rgba(13, 110, 253, 0.15) !important;
+    border: 1px solid rgba(13, 110, 253, 0.4) !important;
+    color: #0d6efd !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    padding: 2px 4px !important;
+}
+
+.fc-daygrid-event-dot {
+    display: none !important;
+}
