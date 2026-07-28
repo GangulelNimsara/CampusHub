@@ -11,7 +11,6 @@
 
 <body>
 
-    <!--For desktop view.-->
     <nav class="navbar navbar-expand-lg bg-light border-bottom border-2 border-dark d-none d-lg-flex py-2">
         <div class="container-fluid">
             <div class="row w-100 align-items-center m-0">
@@ -36,12 +35,15 @@
                     </ul>
                 </div>
 
-                <div class="col-4 d-flex justify-content-end">
+                <div class="col-4 d-flex justify-content-end align-items-center">
                     <a href="../register.php" class="nav-link border border-dark rounded-pill py-2 px-4 me-3 animation-hover">
                         Register <img src="../assets/images/register.svg" class="svg ms-2" width="20">
                     </a>
-                    <a href="../login.php" class="nav-link border border-dark rounded-pill py-2 px-4 animation-hover">
+                    <a href="../login.php" class="nav-link border border-dark rounded-pill py-2 px-4 me-3 animation-hover">
                         Login <img src="../assets/images/login.svg" class="svg ms-2" width="20">
+                    </a>
+                    <a href="../profile.php" class="nav-link border border-dark rounded-circle p-0 animation-hover d-inline-flex align-items-center justify-content-center overflow-hidden" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; flex-shrink: 0;">
+                        <img src="../assets/images/defultProfile.svg" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                     </a>
                 </div>
 
@@ -49,7 +51,6 @@
         </div>
     </nav>
 
-    <!--For mobile viedw.-->
     <nav class="navbar bg-body-tertiary fixed-top border-bottom border-2 border-dark d-flex d-lg-none py-2">
         <div class="container-fluid">
             <div class="row w-100 align-items-center m-0">
@@ -88,8 +89,13 @@
                                     </a>
                                 </li>
                                 <li class="nav-item mt-2">
-                                    <a href="../logout.php" class="nav-link border border-dark rounded-pill py-2 px-4 animation-hover text-center">
+                                    <a href="../login.php" class="nav-link border border-dark rounded-pill py-2 px-4 animation-hover text-center">
                                         Login <img src="../assets/images/login.svg" class="svg ms-2" width="20">
+                                    </a>
+                                </li>
+                                <li class="nav-item mt-2 d-flex justify-content-center">
+                                    <a href="../profile.php" class="nav-link border border-dark rounded-circle p-0 animation-hover d-inline-flex align-items-center justify-content-center overflow-hidden" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; flex-shrink: 0;">
+                                        <img src="../assets/images/defultProfile.svg" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                                     </a>
                                 </li>
                             </ul>

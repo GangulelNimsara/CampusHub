@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 include "includes/db.php";
 
 $usr = $_POST['username'] ?? '';
@@ -23,18 +25,18 @@ if (empty($usr) && empty($pwd)) {
 
     if ($result && $result->num_rows > 0) {
         $data = $result->fetch_assoc();
-
    
         if ($pwd !== $data['password']) {
             echo "Invalid Password";
         } else {
+            $_SESSION["usr"] = $data['username'];
+            $_SESSION["pwd"] = $data['password'];
             echo "success";
+            
         }
-
     } else {
         echo "user_not_found";
     }
-
 }
 
 ?>

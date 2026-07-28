@@ -46,7 +46,7 @@
                         <input type="password" id="password" name="password" class="form-control" required>
                     </div>
                     <div class="mb-4">
-                        <a href="forgetPassword.php">Forget Password?</a>
+                        <a href="forgetPassword.php" class="small fw-bold text-decoration-none">Forget Password?</a>
                     </div>
 
 
