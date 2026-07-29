@@ -28,7 +28,7 @@ $regColsQuery = Database::search("SHOW COLUMNS FROM `registrations`");
 if ($regColsQuery) {
     while ($col = $regColsQuery->fetch_assoc()) {
         $field = $col['Field'];
-        if (in_array($field, ['user_id', 'users_id', 'id_user', 'user_email', 'email'])) {
+        if (in_array($field, ['user_id', 'users_id', 'id_user', 'student_id', 'user_email', 'email'])) {
             $userCol = $field;
         }
         if (in_array($field, ['event_id', 'events_id', 'id_event'])) {
@@ -129,15 +129,17 @@ if ($userCol && $eventCol) {
             </div>
 
             <div class="col-12 col-sm-6 col-xl-3">
-                <div class="p-4 bg-white rounded-4 shadow-sm border border-2 border-dark d-flex align-items-center justify-content-between h-100">
-                    <div>
-                        <span class="text-muted small fw-semibold d-block">FEEDBACK</span>
-                        <h3 class="fw-bold mb-0 mt-1"><?php echo $totalFeedback; ?></h3>
+                <a href="feedback/index.php" class="text-decoration-none text-dark">
+                    <div class="p-4 bg-white rounded-4 shadow-sm border border-2 border-dark d-flex align-items-center justify-content-between h-100">
+                        <div>
+                            <span class="text-muted small fw-semibold d-block">FEEDBACK</span>
+                            <h3 class="fw-bold mb-0 mt-1"><?php echo $totalFeedback; ?></h3>
+                        </div>
+                        <div class="rounded-circle bg-info bg-opacity-10 text-info p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="bi bi-chat-left-text fs-4"></i>
+                        </div>
                     </div>
-                    <div class="rounded-circle bg-info bg-opacity-10 text-info p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                        <i class="bi bi-chat-left-text fs-4"></i>
-                    </div>
-                </div>
+                </a>
             </div>
 
         </div>
@@ -165,7 +167,7 @@ if ($userCol && $eventCol) {
                                             <td class="fw-semibold">
                                                 <?php 
                                                     if (isset($row['first_name'])) {
-                                                        echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']);
+                                                        echo htmlspecialchars(trim($row['first_name'] . ' ' . ($row['last_name'] ?? '')));
                                                     } else {
                                                         echo htmlspecialchars($row[$userCol] ?? 'N/A');
                                                     }
