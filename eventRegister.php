@@ -151,7 +151,7 @@ $categoryName = $event['name'] ?? $event['catogary_name'] ?? $event['category'] 
 
         </div>
     </main>
-
+<?php include "includes/footer.php"; ?>
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/scripts.js"></script>

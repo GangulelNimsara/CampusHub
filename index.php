@@ -197,7 +197,7 @@ $galleryQuery = Database::search("SELECT * FROM `gallery` ORDER BY `id` DESC LIM
             </div>
         </div>
     </div>
-
+<?php include "includes/footer.php"; ?>
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

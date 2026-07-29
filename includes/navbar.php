@@ -3,6 +3,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $isLoggedIn = isset($_SESSION["user"]);
+
+$navProfilePic = "assets/images/defultProfile.svg";
+if ($isLoggedIn && !empty($_SESSION['user']['profilepicpath'])) {
+    $dbPicPath = $_SESSION['user']['profilepicpath'];
+    if (!empty($dbPicPath)) {
+        $navProfilePic = $dbPicPath;
+    }
+}
 ?>
 
 <nav class="navbar navbar-expand-lg fixed-top bg-light border-bottom border-2 border-dark py-2">
@@ -72,8 +80,8 @@ $isLoggedIn = isset($_SESSION["user"]);
                 <?php else: ?>
                     <div class="dropdown">
                         <a href="#" class="nav-link border border-dark rounded-pill px-3 py-1 animation-hover d-inline-flex align-items-center gap-2" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="rounded-circle overflow-hidden d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <img src="<?php echo (!empty($_SESSION['user']['profilepicpath']) && file_exists($_SESSION['user']['profilepicpath'])) ? $_SESSION['user']['profilepicpath'] : 'assets/images/defultProfile.svg'; ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="rounded-circle border border-dark overflow-hidden d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <img src="<?php echo htmlspecialchars($navProfilePic); ?>" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <span class="fw-semibold text-dark"><?php echo htmlspecialchars($_SESSION["user"]["first_name"] ?? $_SESSION["user"]["username"] ?? "User"); ?></span>
                         </a>
@@ -156,7 +164,7 @@ $isLoggedIn = isset($_SESSION["user"]);
                     <a href="profile.php"
                         class="border border-dark rounded-circle overflow-hidden d-flex justify-content-center align-items-center"
                         style="width:45px;height:45px;">
-                        <img src="<?php echo (!empty($_SESSION['user']['profilepicpath']) && file_exists($_SESSION['user']['profilepicpath'])) ? $_SESSION['user']['profilepicpath'] : 'assets/images/defultProfile.svg'; ?>" style="width:100%;height:100%;object-fit:cover;">
+                        <img src="<?php echo htmlspecialchars($navProfilePic); ?>" style="width:100%;height:100%;object-fit:cover;">
                     </a>
                     <span class="fw-bold text-dark"><?php echo htmlspecialchars($_SESSION["user"]["first_name"] ?? $_SESSION["user"]["username"] ?? "User"); ?></span>
                 </li>

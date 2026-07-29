@@ -15,7 +15,9 @@ if (empty(trim($message))) {
     exit();
 }
 
-Database::iud("INSERT INTO `feedback` (`user_id`, `message`) VALUES ('" . $userId . "', '" . mysqli_real_escape_string(Database::$connection, $message) . "')");
+$escapedMessage = addslashes($message);
+
+Database::iud("INSERT INTO `feedback` (`user_id`, `message`) VALUES ('" . $userId . "', '" . $escapedMessage . "')");
 
 echo "success";
 ?>

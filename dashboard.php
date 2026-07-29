@@ -10,9 +10,13 @@ if (!isset($_SESSION["user"])) {
 $userId = $_SESSION["user"]["id"];
 
 $userQuery = Database::search("SELECT * FROM `users` WHERE `id` = '" . $userId . "'");
-$data = $userQuery->fetch_assoc();
+$data = ($userQuery && $userQuery->num_rows > 0) ? $userQuery->fetch_assoc() : [];
 
-$_SESSION["user"] = $data;
+if (!empty($data)) {
+    $_SESSION["user"] = $data;
+}
+
+$displayName = $data["name"] ?? $data["first_name"] ?? "Student";
 
 $registeredCountQuery = Database::search("SELECT COUNT(*) AS `count` FROM `registrations` WHERE `student_id` = '" . $userId . "'");
 $registeredCount = 0;
@@ -28,9 +32,14 @@ if ($announcementsCountQuery && $announcementsCountQuery->num_rows > 0) {
     $announcementsCount = $row['count'];
 }
 
-$enrolledEventsQuery = Database::search("SELECT `registrations`.*, `events`.* 
+$enrolledEventsQuery = Database::search("SELECT `registrations`.*, 
+                                          `events`.`title`, 
+                                          `events`.`event_date`, 
+                                          `events`.`venue`, 
+                                          `registrationstatus`.`status` AS status_name 
                                           FROM `registrations` 
                                           INNER JOIN `events` ON `registrations`.`event_id` = `events`.`id` 
+                                          LEFT JOIN `registrationstatus` ON `registrations`.`registartionStatus` = `registrationstatus`.`id` 
                                           WHERE `registrations`.`student_id` = '" . $userId . "' 
                                           ORDER BY `registrations`.`id` DESC");
 ?>
@@ -56,7 +65,7 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*, `events`.*
 
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
-                    <h3 class="fw-bold mb-0">Welcome, <?php echo htmlspecialchars($data["first_name"]); ?>! 👋</h3>
+                    <h3 class="fw-bold mb-0">Welcome, <?php echo htmlspecialchars($displayName); ?>! 👋</h3>
                     <p class="text-muted small mb-0 d-flex align-items-center gap-2">
                         <span>Manage your enrolled events and campus activities.</span>
                         <?php if (!empty($data['studentId'])): ?>
@@ -145,11 +154,22 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*, `events`.*
                                     <?php
                                     if ($enrolledEventsQuery && $enrolledEventsQuery->num_rows > 0) {
                                         while ($row = $enrolledEventsQuery->fetch_assoc()) {
+                                            $stId = $row['registartionStatus'] ?? 1;
+                                            $stName = $row['status_name'] ?? 'Pending';
+
                                             echo "<tr>";
                                             echo "<td class='fw-bold'>" . htmlspecialchars($row['title']) . "</td>";
                                             echo "<td class='text-muted'>" . htmlspecialchars($row['event_date']) . "</td>";
                                             echo "<td class='text-muted'>" . htmlspecialchars($row['venue']) . "</td>";
-                                            echo "<td><span class='badge bg-success text-white rounded-pill px-3'>Registered</span></td>";
+                                            
+                                            if ($stId == 2) {
+                                                echo "<td><span class='badge bg-success text-white rounded-pill px-3'>" . htmlspecialchars($stName) . "</span></td>";
+                                            } elseif ($stId == 3) {
+                                                echo "<td><span class='badge bg-danger text-white rounded-pill px-3'>" . htmlspecialchars($stName) . "</span></td>";
+                                            } else {
+                                                echo "<td><span class='badge bg-warning text-dark rounded-pill px-3'>" . htmlspecialchars($stName) . "</span></td>";
+                                            }
+                                            
                                             echo "</tr>";
                                         }
                                     } else {
@@ -199,6 +219,8 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*, `events`.*
             </div>
         </div>
     </div>
+
+    <?php include "includes/footer.php"; ?>
 
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

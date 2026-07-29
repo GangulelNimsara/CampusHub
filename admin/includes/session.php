@@ -1,18 +1,11 @@
 ﻿<?php
-include "includes/session.php";
-require "includes/db.php";
-
-$userId = $_SESSION["user"]["id"];
-
-$regCountResult = Database::search("SELECT COUNT(*) AS `total` FROM `registrations` WHERE `user_id` = '" . $userId . "'");
-$registeredCount = 0;
-if ($regCountResult && $row = $regCountResult->fetch_assoc()) {
-    $registeredCount = $row['total'];
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-$announcementResult = Database::search("SELECT COUNT(*) AS `total` FROM `announcements`");
-$announcementCount = 0;
-if ($announcementResult && $row = $announcementResult->fetch_assoc()) {
-    $announcementCount = $row['total'];
+
+if (!isset($_SESSION["user"])) {
+    header("Location: login.php");
+    exit();
 }
 ?>

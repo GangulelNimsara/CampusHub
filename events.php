@@ -3,6 +3,7 @@ include "includes/session.php";
 include "includes/db.php";
 
 $isLoggedIn = isset($_SESSION["user"]);
+$userId = $isLoggedIn ? $_SESSION["user"]["id"] : 0;
 
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 6;
@@ -56,6 +57,15 @@ $eventsResult = Database::search($eventsQuery);
                     while ($event = $eventsResult->fetch_assoc()) {
                         $categoryName = $event['name'] ?? $event['catogary_name'] ?? $event['category'] ?? $event['title'] ?? '';
                         $eventId = $event['event_real_id'];
+
+                        $regStatus = 0;
+                        if ($isLoggedIn) {
+                            $checkReg = Database::search("SELECT `registartionStatus` FROM `registrations` WHERE `student_id` = '" . $userId . "' AND `event_id` = '" . $eventId . "'");
+                            if ($checkReg && $checkReg->num_rows > 0) {
+                                $regRow = $checkReg->fetch_assoc();
+                                $regStatus = (int)($regRow['registartionStatus'] ?? 1);
+                            }
+                        }
                         ?>
                         <div class="col-md-6 col-lg-4">
                             <div class="card h-100 border-2 border-dark rounded-4 shadow-sm bg-white overflow-hidden">
@@ -82,9 +92,19 @@ $eventsResult = Database::search($eventsQuery);
 
                                     <div class="pt-2 border-top">
                                         <?php if ($isLoggedIn): ?>
-                                            <button class="btn btn-primary w-100 rounded-pill fw-semibold" onclick="registerForEvent(<?php echo $eventId; ?>);">
-                                                Register Now 🎟️
-                                            </button>
+                                            <?php if ($regStatus === 2): ?>
+                                                <button class="btn btn-success w-100 rounded-pill fw-semibold" disabled>
+                                                    Registered ✓
+                                                </button>
+                                            <?php elseif ($regStatus === 1): ?>
+                                                <button class="btn btn-secondary w-100 rounded-pill fw-semibold" disabled>
+                                                    Pending Approval ⏳
+                                                </button>
+                                            <?php else: ?>
+                                                <button class="btn btn-primary w-100 rounded-pill fw-semibold" onclick="registerForEvent(<?php echo $eventId; ?>);">
+                                                    Register Now 🎟️
+                                                </button>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <a href="login.php" class="btn btn-outline-dark w-100 rounded-pill fw-semibold">
                                                 Login to Register 🔒
@@ -128,7 +148,7 @@ $eventsResult = Database::search($eventsQuery);
 
         </div>
     </main>
-
+<?php include "includes/footer.php"; ?>
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/scripts.js"></script>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<announcements>
+    <announcement id="1">
+        <title>Library Extended Hours</title>
+        <category>Academic</category>
+        <date>2026-08-01</date>
+        <content>The central campus library will remain open until midnight during exam week.</content>
+    </announcement>
+    <announcement id="2">
+        <title>Sports Complex Maintenance</title>
+        <category>Facilities</category>
+        <date>2026-08-05</date>
+        <content>The indoor sports arena will be closed for floor maintenance this weekend.</content>
+    </announcement>
+</announcements>
