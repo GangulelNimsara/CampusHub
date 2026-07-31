@@ -116,6 +116,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     calendar.render();
   }
+
+  const profileImageInput = document.getElementById("profile-image-input");
+  if (profileImageInput) {
+    profileImageInput.addEventListener("change", function () {
+      if (this.files && this.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('profile-img-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+  }
 });
 
 // Mobile Input Setup
@@ -353,7 +366,46 @@ function resetPasswordProcess() {
 
 // Event Actions
 function registerForEvent(eventId) {
-  window.location.href = "eventRegister.php?event_id=" + eventId;
+  CampusAlert.fire({
+    title: 'Register for Event?',
+    text: "Are you sure you want to register for this campus event?",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Register! 🎟️'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var form = new FormData();
+      form.append("eventId", eventId);
+
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+          var response = request.responseText.trim();
+          if (response === "success") {
+            CampusAlert.fire({
+              icon: "success",
+              title: "Success! 🎉",
+              text: "Registration request submitted.",
+              confirmButtonText: "Great"
+            }).then(() => {
+              location.reload();
+            });
+          } else if (response === "login_required") {
+            window.location.href = "login.php";
+          } else {
+            CampusAlert.fire({
+              icon: "error",
+              title: "Error",
+              text: response,
+              confirmButtonText: "Try Again"
+            });
+          }
+        }
+      };
+      request.open("POST", "registerEventProcess.php", true);
+      request.send(form);
+    }
+  });
 }
 
 function registerEvent() {
@@ -437,6 +489,7 @@ function nextImage() {
   currentGalleryIndex = (currentGalleryIndex + 1) % window.galleryItems.length;
   updateModalContent();
 }
+
 // Submit Feedback from eventRegister.php
 function submitEventFeedback() {
   const messageInput = document.getElementById("eventFeedbackMessage");
@@ -545,21 +598,6 @@ function submitDashboardFeedback() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const profileImageInput = document.getElementById("profile-image-input");
-  if (profileImageInput) {
-    profileImageInput.addEventListener("change", function () {
-      if (this.files && this.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          document.getElementById('profile-img-preview').src = e.target.result;
-        };
-        reader.readAsDataURL(this.files[0]);
-      }
-    });
-  }
-});
-
 function updateProfileProcess() {
   var form = document.getElementById("profileForm");
   var formData = new FormData(form);
@@ -646,12 +684,37 @@ function adminLoginProcess() {
     });
 }
 
+function addStudentProcess() {
+  var form = document.getElementById("addStudentForm");
+  if (!form) return;
+
+  var formData = new FormData(form);
+
+  fetch("add.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.text())
+    .then(data => {
+      var res = data.trim();
+      if (res === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Student Added!',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          window.location.href = "index.php";
+        });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
+      }
+    })
+    .catch(err => console.error(err));
+}
+
 function editStudentProcess() {
   var form = document.getElementById("editStudentForm");
-  if (!form) {
-    console.error("Form 'editStudentForm' not found!");
-    return;
-  }
+  if (!form) return;
 
   var formData = new FormData(form);
 
@@ -661,7 +724,6 @@ function editStudentProcess() {
   })
     .then(res => res.text())
     .then(data => {
-      console.log("Response:", data);
       var res = data.trim();
       if (res === "success") {
         Swal.fire({
@@ -672,460 +734,396 @@ function editStudentProcess() {
           window.location.href = "index.php";
         });
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: res,
-          confirmButtonColor: '#000'
-        });
+        Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
       }
     })
-    .catch(error => {
-      console.error("Fetch Error:", error);
-    });
+    .catch(err => console.error(err));
 }
-
 
 function deleteStudent(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This student account will be deleted permanently!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#000',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData();
-            formData.append("id", id);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This student account will be deleted permanently!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#000',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var formData = new FormData();
+      formData.append("id", id);
 
-            fetch("delete.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.text())
-            .then(data => {
-                if (data.trim() === "success") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deleted!',
-                        text: 'Student record has been deleted.',
-                        confirmButtonColor: '#000'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.trim(),
-                        confirmButtonColor: '#000'
-                    });
-                }
-            })
-            .catch(err => console.error(err));
-        }
-    });
-}
-
-function addStudentProcess() {
-    var form = document.getElementById("addStudentForm");
-    if (!form) return;
-
-    var formData = new FormData(form);
-
-    fetch("add.php", {
+      fetch("delete.php", {
         method: "POST",
         body: formData
-    })
-    .then(res => res.text())
-    .then(data => {
-        var res = data.trim();
-        if (res === "success") {
+      })
+        .then(res => res.text())
+        .then(data => {
+          if (data.trim() === "success") {
             Swal.fire({
-                icon: 'success',
-                title: 'Student Added!',
-                confirmButtonColor: '#000'
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Student record has been deleted.',
+              confirmButtonColor: '#000'
             }).then(() => {
-                window.location.href = "index.php";
+              location.reload();
             });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
-        }
-    })
-    .catch(err => console.error(err));
-}
-
-function editStudentProcess() {
-    var form = document.getElementById("editStudentForm");
-    if (!form) return;
-
-    var formData = new FormData(form);
-
-    fetch("edit.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.text())
-    .then(data => {
-        var res = data.trim();
-        if (res === "success") {
+          } else {
             Swal.fire({
-                icon: 'success',
-                title: 'Student Updated!',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                window.location.href = "index.php";
+              icon: 'error',
+              title: 'Error',
+              text: data.trim(),
+              confirmButtonColor: '#000'
             });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
-        }
-    })
-    .catch(err => console.error(err));
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  });
 }
 
 function approveRegistration(id) {
-    var formData = new FormData();
-    formData.append("id", id);
+  var formData = new FormData();
+  formData.append("id", id);
 
-    fetch("approve.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("approve.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.text())
     .then(data => {
-        if (data.trim() === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Approved!',
-                text: 'Registration status has been updated to approved.',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                location.reload();
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.trim(),
-                confirmButtonColor: '#000'
-            });
-        }
+      if (data.trim() === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Approved!',
+          text: 'Registration status has been updated to approved.',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.trim(),
+          confirmButtonColor: '#000'
+        });
+      }
     })
     .catch(err => console.error(err));
 }
 
 function deleteRegistration(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This registration will be permanently removed!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#000',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData();
-            formData.append("id", id);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This registration will be permanently removed!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#000',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var formData = new FormData();
+      formData.append("id", id);
 
-            fetch("delete.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.text())
-            .then(data => {
-                if (data.trim() === "success") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deleted!',
-                        text: 'Registration has been deleted.',
-                        confirmButtonColor: '#000'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.trim(),
-                        confirmButtonColor: '#000'
-                    });
-                }
-            })
-            .catch(err => console.error(err));
-        }
-    });
+      fetch("delete.php", {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.text())
+        .then(data => {
+          if (data.trim() === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Registration has been deleted.',
+              confirmButtonColor: '#000'
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.trim(),
+              confirmButtonColor: '#000'
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  });
 }
 
 function uploadMediaProcess() {
-    var form = document.getElementById("uploadMediaForm");
-    if (!form) return;
+  var form = document.getElementById("uploadMediaForm");
+  if (!form) return;
 
-    var formData = new FormData(form);
+  var formData = new FormData(form);
 
-    fetch("upload.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("upload.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.text())
     .then(data => {
-        var res = data.trim();
-        if (res === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Media Uploaded!',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                window.location.href = "index.php";
-            });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
-        }
+      var res = data.trim();
+      if (res === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Media Uploaded!',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          window.location.href = "index.php";
+        });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
+      }
     })
     .catch(err => console.error(err));
 }
 
 function deleteMedia(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This image will be deleted permanently!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#000',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData();
-            formData.append("id", id);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This image will be deleted permanently!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#000',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var formData = new FormData();
+      formData.append("id", id);
 
-            fetch("delete.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.text())
-            .then(data => {
-                if (data.trim() === "success") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deleted!',
-                        text: 'Media item has been deleted.',
-                        confirmButtonColor: '#000'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.trim(),
-                        confirmButtonColor: '#000'
-                    });
-                }
-            })
-            .catch(err => console.error(err));
-        }
-    });
+      fetch("delete.php", {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.text())
+        .then(data => {
+          if (data.trim() === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Media item has been deleted.',
+              confirmButtonColor: '#000'
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.trim(),
+              confirmButtonColor: '#000'
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  });
 }
 
 function addEventProcess() {
-    var form = document.getElementById("addEventForm");
-    if (!form) return;
+  var form = document.getElementById("addEventForm");
+  if (!form) return;
 
-    var formData = new FormData(form);
+  var formData = new FormData(form);
 
-    fetch("add.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("add.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.text())
     .then(data => {
-        var res = data.trim();
-        if (res === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Event Created!',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                window.location.href = "index.php";
-            });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
-        }
+      var res = data.trim();
+      if (res === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Event Created!',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          window.location.href = "index.php";
+        });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
+      }
     })
     .catch(err => console.error(err));
 }
 
 function editEventProcess() {
-    var form = document.getElementById("editEventForm");
-    if (!form) return;
+  var form = document.getElementById("editEventForm");
+  if (!form) return;
 
-    var formData = new FormData(form);
+  var formData = new FormData(form);
 
-    fetch("edit.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("edit.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.text())
     .then(data => {
-        var res = data.trim();
-        if (res === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Event Updated!',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                window.location.href = "index.php";
-            });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
-        }
+      var res = data.trim();
+      if (res === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Event Updated!',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          window.location.href = "index.php";
+        });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res, confirmButtonColor: '#000' });
+      }
     })
     .catch(err => console.error(err));
 }
 
 function deleteEvent(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This event and its student registrations will be deleted permanently!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#000',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData();
-            formData.append("id", id);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This event and its student registrations will be deleted permanently!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#000',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var formData = new FormData();
+      formData.append("id", id);
 
-            fetch("delete.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.text())
-            .then(data => {
-                var response = data.trim();
-                if (response === "success") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deleted!',
-                        text: 'Event has been deleted.',
-                        confirmButtonColor: '#000'
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response,
-                        confirmButtonColor: '#000'
-                    });
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                Swal.fire({ icon: 'error', title: 'Request Failed', text: err.toString() });
+      fetch("delete.php", {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.text())
+        .then(data => {
+          var response = data.trim();
+          if (response === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Event has been deleted.',
+              confirmButtonColor: '#000'
+            }).then(() => {
+              window.location.reload();
             });
-        }
-    });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response,
+              confirmButtonColor: '#000'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({ icon: 'error', title: 'Request Failed', text: err.toString() });
+        });
+    }
+  });
 }
 
 function addAnnouncementProcess() {
-    var form = document.getElementById("addAnnouncementForm");
-    if (!form) return;
+  var form = document.getElementById("addAnnouncementForm");
+  if (!form) return;
 
-    var formData = new FormData(form);
+  var formData = new FormData(form);
 
-    fetch("add.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("add.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.text())
     .then(data => {
-        if (data.trim() === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Announcement Published!',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                window.location.href = "index.php";
-            });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: data.trim(), confirmButtonColor: '#000' });
-        }
+      if (data.trim() === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Announcement Published!',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          window.location.href = "index.php";
+        });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: data.trim(), confirmButtonColor: '#000' });
+      }
     })
     .catch(err => console.error(err));
 }
 
 function editAnnouncementProcess() {
-    var form = document.getElementById("editAnnouncementForm");
-    if (!form) return;
+  var form = document.getElementById("editAnnouncementForm");
+  if (!form) return;
 
-    var formData = new FormData(form);
+  var formData = new FormData(form);
 
-    fetch("edit.php", {
-        method: "POST",
-        body: formData
-    })
+  fetch("edit.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.text())
     .then(data => {
-        if (data.trim() === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Announcement Updated!',
-                confirmButtonColor: '#000'
-            }).then(() => {
-                window.location.href = "index.php";
-            });
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: data.trim(), confirmButtonColor: '#000' });
-        }
+      if (data.trim() === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: 'Announcement Updated!',
+          confirmButtonColor: '#000'
+        }).then(() => {
+          window.location.href = "index.php";
+        });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: data.trim(), confirmButtonColor: '#000' });
+      }
     })
     .catch(err => console.error(err));
 }
 
 function deleteAnnouncement(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This announcement will be permanently deleted!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#000',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData();
-            formData.append("id", id);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This announcement will be permanently deleted!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#000',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var formData = new FormData();
+      formData.append("id", id);
 
-            fetch("delete.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.text())
-            .then(data => {
-                if (data.trim() === "success") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Deleted!',
-                        text: 'Announcement has been deleted.',
-                        confirmButtonColor: '#000'
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.trim(),
-                        confirmButtonColor: '#000'
-                    });
-                }
-            })
-            .catch(err => console.error(err));
-        }
-    });
+      fetch("delete.php", {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.text())
+        .then(data => {
+          if (data.trim() === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Announcement has been deleted.',
+              confirmButtonColor: '#000'
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.trim(),
+              confirmButtonColor: '#000'
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  });
 }

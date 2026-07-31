@@ -93,15 +93,17 @@ $categoriesQuery = Database::search("SELECT * FROM `categories` ORDER BY `id` AS
 
                 <div class="mb-3">
                     <label class="form-label small fw-semibold">Category</label>
-                    <select class="form-select rounded-3 border-dark" name="category_id" required>
+                    <select name="category_id" id="category_id" class="form-select rounded-3">
                         <option value="">Select Category</option>
-                        <?php if ($categoriesQuery && $categoriesQuery->num_rows > 0): ?>
-                            <?php while ($cat = $categoriesQuery->fetch_assoc()): ?>
-                                <option value="<?php echo $cat['id']; ?>">
-                                    <?php echo htmlspecialchars($cat['name'] ?? $cat['catogary_name'] ?? ('Category #' . $cat['id'])); ?>
-                                </option>
-                            <?php endwhile; ?>
-                        <?php endif; ?>
+                        <?php
+                        $categoriesQuery = Database::search("SELECT * FROM `categories` ORDER BY `category` ASC");
+                        if ($categoriesQuery && $categoriesQuery->num_rows > 0) {
+                            while ($cat = $categoriesQuery->fetch_assoc()) {
+                                $catName = $cat['category'] ?? $cat['name'] ?? $cat['title'] ?? 'Category ' . $cat['id'];
+                                echo '<option value="' . htmlspecialchars($cat['id']) . '">' . htmlspecialchars($catName) . '</option>';
+                            }
+                        }
+                        ?>
                     </select>
                 </div>
 

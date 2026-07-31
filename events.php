@@ -30,6 +30,9 @@ $eventsResult = Database::search($eventsQuery);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Events - Campus Hub</title>
 
+    <link rel="icon" type="image/jpeg" href="assets/images/app-icon.jpg?v=<?php echo time(); ?>">
+    <link rel="shortcut icon" type="image/jpeg" href="assets/images/app-icon.jpg?v=<?php echo time(); ?>">
+
     <link rel="stylesheet" href="assets/css/bootstrap.css">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -148,7 +151,9 @@ $eventsResult = Database::search($eventsQuery);
 
         </div>
     </main>
-<?php include "includes/footer.php"; ?>
+
+    <?php include "includes/footer.php"; ?>
+
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/scripts.js"></script>

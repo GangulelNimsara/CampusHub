@@ -48,17 +48,30 @@ $studentsQuery = Database::search("SELECT * FROM `users` ORDER BY `id` DESC");
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Mobile</th>
+                            <th scope="col">Status</th>
                             <th scope="col" class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if ($studentsQuery && $studentsQuery->num_rows > 0): ?>
                             <?php while ($student = $studentsQuery->fetch_assoc()): ?>
+                                <?php $statusId = (int)($student['status_id'] ?? 1); ?>
                                 <tr>
                                     <td class="fw-bold">#<?php echo htmlspecialchars($student['id']); ?></td>
                                     <td><?php echo htmlspecialchars(($student['first_name'] ?? '') . ' ' . ($student['last_name'] ?? '')); ?></td>
                                     <td><?php echo htmlspecialchars($student['email'] ?? 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($student['mobile'] ?? 'N/A'); ?></td>
+                                    <td>
+                                        <?php if ($statusId === 1): ?>
+                                            <button class="btn btn-sm btn-success rounded-pill px-3 fw-semibold" onclick="changeStudentStatus(<?php echo $student['id']; ?>, 1);">
+                                                🟢 Active
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn btn-sm btn-danger rounded-pill px-3 fw-semibold" onclick="changeStudentStatus(<?php echo $student['id']; ?>, 2);">
+                                                🔴 Inactive
+                                            </button>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="text-end">
                                         <a href="edit.php?id=<?php echo $student['id']; ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3 me-1">
                                             <i class="bi bi-pencil"></i> Edit
@@ -71,7 +84,7 @@ $studentsQuery = Database::search("SELECT * FROM `users` ORDER BY `id` DESC");
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">No students registered yet.</td>
+                                <td colspan="6" class="text-center text-muted py-4">No students registered yet.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -84,6 +97,53 @@ $studentsQuery = Database::search("SELECT * FROM `users` ORDER BY `id` DESC");
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
+        function changeStudentStatus(studentId, currentStatus) {
+            var newStatus = (currentStatus == 1) ? 2 : 1;
+            var statusText = (newStatus == 1) ? 'Active' : 'Inactive';
+
+            Swal.fire({
+                title: 'Change Account Status?',
+                text: "Change student status to " + statusText + "?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#000',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, change it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    formData.append("id", studentId);
+                    formData.append("status", newStatus);
+
+                    fetch("changeStatusProcess.php", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(res => res.text())
+                    .then(data => {
+                        if (data.trim() === "success") {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Status Updated!',
+                                text: 'Student status set to ' + statusText,
+                                confirmButtonColor: '#000'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.trim(),
+                                confirmButtonColor: '#000'
+                            });
+                        }
+                    })
+                    .catch(err => console.error(err));
+                }
+            });
+        }
+
         function deleteStudent(id) {
             Swal.fire({
                 title: 'Are you sure?',

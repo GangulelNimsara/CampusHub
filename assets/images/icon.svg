@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .outer-ring { fill: none; stroke: #4f5b66; stroke-width: 14; }
+      .compass-ring { fill: none; stroke: #4f5b66; stroke-width: 22; }
+      .compass-star-dark { fill: #4f5b66; }
+      .compass-star-light { fill: #6c7a89; }
+      .net-blue { fill: none; stroke: #1b4965; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+      .net-slate { fill: none; stroke: #5c6b73; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+      .node-blue { fill: #1b4965; }
+      .node-slate { fill: #5c6b73; }
+      .cap-fill { fill: #333d47; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="512" height="512" />
+
+  <!-- Outer Circle Frame -->
+  <circle class="outer-ring" cx="256" cy="256" r="230" />
+
+  <!-- Inner Compass Ring -->
+  <circle class="compass-ring" cx="256" cy="256" r="120" />
+
+  <!-- Center Compass Star -->
+  <!-- North Point -->
+  <polygon class="compass-star-dark" points="256,256 256,60 274,238" />
+  <polygon class="compass-star-light" points="256,256 256,60 238,238" />
+  <!-- South Point -->
+  <polygon class="compass-star-dark" points="256,256 256,452 238,274" />
+  <polygon class="compass-star-light" points="256,256 256,452 274,274" />
+  <!-- East Point -->
+  <polygon class="compass-star-dark" points="256,256 452,256 274,274" />
+  <polygon class="compass-star-light" points="256,256 452,256 274,238" />
+  <!-- West Point -->
+  <polygon class="compass-star-dark" points="256,256 60,256 238,238" />
+  <polygon class="compass-star-light" points="256,256 60,256 238,274" />
+  <!-- Diagonal Points -->
+  <polygon class="compass-star-dark" points="256,256 380,132 270,242" />
+  <polygon class="compass-star-light" points="256,256 380,132 242,270" />
+  <polygon class="compass-star-dark" points="256,256 132,380 242,270" />
+  <polygon class="compass-star-light" points="256,256 132,380 270,242" />
+  <polygon class="compass-star-dark" points="256,256 380,380 270,272" />
+  <polygon class="compass-star-light" points="256,256 380,380 272,270" />
+  <polygon class="compass-star-dark" points="256,256 132,132 242,244" />
+  <polygon class="compass-star-light" points="256,256 132,132 244,242" />
+
+  <!-- Network Web Lines (Blue - Left/Outer) -->
+  <polyline class="net-blue" points="256,76 180,135 110,256 150,380 256,440" />
+  <polyline class="net-blue" points="256,76 195,220 110,256 200,310 256,440" />
+  <polyline class="net-blue" points="180,135 256,200 150,380" />
+  <line class="net-blue" x1="180" y1="135" x2="200" y2="310" />
+
+  <!-- Network Web Lines (Slate - Right) -->
+  <polyline class="net-slate" points="256,76 332,135 402,256 362,380 256,440" />
+  <polyline class="net-slate" points="256,76 317,220 402,256 312,310 256,440" />
+  <polyline class="net-slate" points="332,135 256,200 362,380" />
+  <line class="net-slate" x1="332" y1="135" x2="312" y2="310" />
+
+  <!-- Network Nodes -->
+  <circle class="node-blue" cx="180" cy="135" r="12" />
+  <circle class="node-blue" cx="110" cy="256" r="12" />
+  <circle class="node-blue" cx="150" cy="380" r="12" />
+  <circle class="node-blue" cx="256" cy="440" r="12" />
+  
+  <circle class="node-slate" cx="332" cy="135" r="12" />
+  <circle class="node-slate" cx="402" cy="256" r="12" />
+  <circle class="node-slate" cx="362" cy="380" r="12" />
+
+  <!-- Top Graduation Cap -->
+  <g transform="translate(0, -10)">
+    <polygon class="cap-fill" points="256,65 296,80 256,95 216,80" />
+    <path class="cap-fill" d="M230,87 v12 c0,8 52,8 52,0 v-12 Z" />
+    <path class="cap-fill" d="M219,81 v20 c-2,5 -5,8 -5,12" stroke="#333d47" stroke-width="3" fill="none" />
+  </g>
+
+  <!-- Center Graduation Cap (Small) -->
+  <g transform="translate(0, 180) scale(0.7) translate(110, 20)">
+    <polygon class="cap-fill" points="256,65 296,80 256,95 216,80" />
+    <path class="cap-fill" d="M230,87 v12 c0,8 52,8 52,0 v-12 Z" />
+    <path class="cap-fill" d="M219,81 v20 c-2,5 -5,8 -5,12" stroke="#333d47" stroke-width="3" fill="none" />
+  </g>
+</svg>

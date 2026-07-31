@@ -42,6 +42,20 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*,
                                           LEFT JOIN `registrationstatus` ON `registrations`.`registartionStatus` = `registrationstatus`.`id` 
                                           WHERE `registrations`.`student_id` = '" . $userId . "' 
                                           ORDER BY `registrations`.`id` DESC");
+
+$calendarEventsQuery = Database::search("SELECT `events`.`title`, `events`.`event_date` FROM `registrations` INNER JOIN `events` ON `registrations`.`event_id` = `events`.`id` WHERE `registrations`.`student_id` = '" . $userId . "'");
+$calendarEvents = [];
+if ($calendarEventsQuery && $calendarEventsQuery->num_rows > 0) {
+    while ($cRow = $calendarEventsQuery->fetch_assoc()) {
+        $calendarEvents[] = [
+            'title' => $cRow['title'],
+            'start' => $cRow['event_date']
+        ];
+    }
+}
+
+$latestEventQuery = Database::search("SELECT * FROM `events` ORDER BY `id` DESC LIMIT 1");
+$latestEvent = ($latestEventQuery && $latestEventQuery->num_rows > 0) ? $latestEventQuery->fetch_assoc() : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,6 +64,9 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*,
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Campus Hub</title>
+
+    <link rel="icon" type="image/svg+xml" href="assets/images/icon.svg?v=<?php echo time(); ?>">
+    <link rel="alternate icon" type="image/png" href="assets/images/app-icon.jpg">
 
     <link rel="stylesheet" href="assets/css/bootstrap.css">
     <link rel="stylesheet" href="assets/css/styles.css">
@@ -62,6 +79,20 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*,
 
     <main class="py-5 mt-4 min-vh-100 dashboard-container">
         <div class="container-fluid px-4 px-md-5">
+
+            <?php if ($latestEvent): ?>
+                <div class="alert alert-warning border-2 border-dark rounded-4 shadow-sm mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-danger text-white rounded-pill px-3 py-2 fw-semibold">📢 Upcoming Event</span>
+                        <strong class="fs-6"><?php echo htmlspecialchars($latestEvent['title']); ?></strong>
+                        <span class="text-muted small">| 📅 <?php echo htmlspecialchars($latestEvent['event_date']); ?></span>
+                        <?php if (!empty($latestEvent['venue'])): ?>
+                            <span class="text-muted small">| 📍 <?php echo htmlspecialchars($latestEvent['venue']); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <a href="events.php" class="btn btn-dark btn-sm rounded-pill px-3 fw-semibold">View All Events 🎟️</a>
+                </div>
+            <?php endif; ?>
 
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
@@ -225,6 +256,46 @@ $enrolledEventsQuery = Database::search("SELECT `registrations`.*,
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            if (calendarEl && typeof FullCalendar !== 'undefined') {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    height: 'auto',
+                    events: <?php echo json_encode($calendarEvents); ?>
+                });
+                calendar.render();
+            }
+        });
+
+        function submitDashboardFeedback() {
+            var message = document.getElementById("dashboardFeedbackMessage").value;
+            if (!message.trim()) {
+                Swal.fire("Error", "Please enter a message.", "error");
+                return;
+            }
+
+            var form = new FormData();
+            form.append("message", message);
+
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    if (request.responseText.trim() == "success") {
+                        Swal.fire("Success", "Feedback submitted successfully!", "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Error", request.responseText, "error");
+                    }
+                }
+            };
+            request.open("POST", "submitFeedbackProcess.php", true);
+            request.send(form);
+        }
+    </script>
     <script src="assets/js/scripts.js"></script>
 
 </body>
