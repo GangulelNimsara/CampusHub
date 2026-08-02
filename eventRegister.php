@@ -61,10 +61,10 @@ $categoryName = $event['name'] ?? $event['catogary_name'] ?? $event['category'] 
                     <div class="card border-2 border-dark rounded-4 p-3 shadow-sm bg-white mb-4">
                         <div class="row g-3 align-items-center">
                             <div class="col-md-4">
-                                <img src="<?php echo !empty($event['bannerPath']) ? htmlspecialchars($event['bannerPath']) : 'assets/images/defaultEvent.png'; ?>" 
-                                     class="img-fluid rounded-3 border border-dark w-100" 
-                                     alt="Event Banner" 
-                                     style="height: 140px; object-fit: cover;">
+                                <img src="<?php echo !empty($event['bannerPath']) ? htmlspecialchars($event['bannerPath']) : 'assets/images/defaultEvent.png'; ?>"
+                                    class="img-fluid rounded-3 border border-dark w-100"
+                                    alt="Event Banner"
+                                    style="height: 140px; object-fit: cover;">
                             </div>
                             <div class="col-md-8">
                                 <?php if (!empty($categoryName)): ?>
@@ -74,7 +74,7 @@ $categoryName = $event['name'] ?? $event['catogary_name'] ?? $event['category'] 
                                 <?php endif; ?>
 
                                 <h4 class="fw-bold mb-2"><?php echo htmlspecialchars($event['title']); ?></h4>
-                                
+
                                 <div class="small text-muted mb-0">
                                     <?php if (!empty($event['event_date'])): ?>
                                         <span class="me-3">📅 <?php echo htmlspecialchars($event['event_date']); ?></span>
@@ -131,11 +131,10 @@ $categoryName = $event['name'] ?? $event['catogary_name'] ?? $event['category'] 
                         </form>
                     </div>
 
-                    <!-- Event Feedback Card -->
                     <div class="card border-2 border-dark rounded-4 p-4 shadow-sm bg-white">
                         <h5 class="fw-bold mb-2">💬 Event Feedback & Suggestions</h5>
                         <p class="text-muted small mb-3">Have a question or feedback about this event? Send a message directly to the administrators.</p>
-                        
+
                         <form id="eventFeedbackForm">
                             <div class="mb-3">
                                 <textarea id="eventFeedbackMessage" class="form-control rounded-3 border-dark" rows="3" placeholder="Write your thoughts or queries..."></textarea>
@@ -151,7 +150,7 @@ $categoryName = $event['name'] ?? $event['catogary_name'] ?? $event['category'] 
 
         </div>
     </main>
-<?php include "includes/footer.php"; ?>
+    <?php include "includes/footer.php"; ?>
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/scripts.js"></script>

@@ -57,19 +57,19 @@ $galleryResult = Database::search($galleryQuery);
                         $imagePath = !empty($image['file_path']) ? $image['file_path'] : (!empty($image['path']) ? $image['path'] : (!empty($image['imagePath']) ? $image['imagePath'] : (!empty($image['image_path']) ? $image['image_path'] : 'assets/images/defaultEvent.png')));
                         $title = !empty($image['title']) ? $image['title'] : 'Campus Memory';
                         $galleryItemsList[] = array('src' => $imagePath, 'title' => $title);
-                        ?>
+                ?>
                         <div class="col-6 col-md-4 col-lg-3">
-                            <div class="card h-100 border-2 border-dark rounded-4 shadow-sm bg-white overflow-hidden cursor-pointer" 
-                                 style="cursor: pointer;"
-                                 onclick="openImagePreview(<?php echo $index; ?>)">
+                            <div class="card h-100 border-2 border-dark rounded-4 shadow-sm bg-white overflow-hidden cursor-pointer"
+                                style="cursor: pointer;"
+                                onclick="openImagePreview(<?php echo $index; ?>)">
                                 <img src="<?php echo htmlspecialchars($imagePath); ?>" class="card-img-top" alt="Gallery Image" style="height: 200px; object-fit: cover;">
-                                
+
                                 <div class="card-body p-2 text-center d-flex flex-column justify-content-center">
                                     <h6 class="fw-bold text-truncate mb-0 small"><?php echo htmlspecialchars($title); ?></h6>
                                 </div>
                             </div>
                         </div>
-                        <?php
+                    <?php
                         $index++;
                     }
                 } else {
@@ -77,7 +77,7 @@ $galleryResult = Database::search($galleryQuery);
                     <div class="col-12 text-center text-muted py-5">
                         No photos added to the gallery yet.
                     </div>
-                    <?php
+                <?php
                 }
                 ?>
             </div>
@@ -105,7 +105,6 @@ $galleryResult = Database::search($galleryQuery);
         </div>
     </main>
 
-    <!-- Image Preview Modal with Slider Arrows -->
     <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-2 border-dark rounded-4 overflow-hidden">
@@ -121,7 +120,7 @@ $galleryResult = Database::search($galleryQuery);
             </div>
         </div>
     </div>
-<?php include "includes/footer.php"; ?>
+    <?php include "includes/footer.php"; ?>
     <script src="assets/js/bootstrap.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

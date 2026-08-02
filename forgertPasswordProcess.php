@@ -56,13 +56,11 @@ if ($result && $result->num_rows > 0) {
         <tr>
             <td align="center" style="padding: 40px 0;">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #ffffff; border: 2px solid #212529; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                    <!-- Header -->
                     <tr>
                         <td align="center" style="padding: 25px 20px; background-color: #f8f9fa; border-bottom: 2px solid #212529;">
                             <h2 style="margin: 0; color: #0d6efd; font-size: 24px; font-weight: bold;">Campus<span style="color: #ffc107;">Hub</span></h2>
                         </td>
                     </tr>
-                    <!-- Body -->
                     <tr>
                         <td style="padding: 30px 25px; text-align: center;">
                             <h3 style="margin-top: 0; color: #212529; font-size: 20px;">Password Reset Request</h3>
@@ -70,7 +68,6 @@ if ($result && $result->num_rows > 0) {
                                 We received a request to reset your password. Use the verification code below to complete the process:
                             </p>
 
-                            <!-- OTP Box -->
                             <div style="background-color: #e9ecef; border: 2px dashed #212529; border-radius: 10px; padding: 15px; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #0d6efd; display: inline-block; margin-bottom: 25px;">
                                 ' . $vcode . '
                             </div>
@@ -80,7 +77,6 @@ if ($result && $result->num_rows > 0) {
                             </p>
                         </td>
                     </tr>
-                    <!-- Footer -->
                     <tr>
                         <td align="center" style="padding: 15px; background-color: #f8f9fa; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 12px;">
                             © 2026 Campus Hub. All rights reserved.

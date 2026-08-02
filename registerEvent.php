@@ -35,7 +35,6 @@ if (!isset($_SESSION["user"])) {
                         <a href="events.php" class="btn btn-outline-dark btn-sm rounded-pill px-3">← Back to Events</a>
                     </div>
 
-                    <!-- Event Preview Card -->
                     <div class="card border-2 border-dark rounded-4 p-3 mb-4 shadow-sm bg-white">
                         <div class="row align-items-center g-3">
                             <div class="col-12 col-md-4">
@@ -50,7 +49,6 @@ if (!isset($_SESSION["user"])) {
                         </div>
                     </div>
 
-                    <!-- Student Registration Form -->
                     <div class="card border-2 border-dark rounded-4 p-4 shadow-sm bg-white">
                         <form id="studentEventRegisterForm">
                             <input type="hidden" id="event-id" name="event_id" value="<?php echo $_GET['id'] ?? ''; ?>">
