@@ -8,6 +8,16 @@ $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] :
 $limit = 6;
 $offset = ($page - 1) * $limit;
 
+// 1. THIS IS THE MISSING XML LOADING CODE
+$xmlFile = "xml/announcements.xml";
+$xmlAnnouncements = [];
+if (file_exists($xmlFile)) {
+    $xmlData = simplexml_load_file($xmlFile);
+    if ($xmlData !== false) {
+        $xmlAnnouncements = $xmlData->announcement;
+    }
+}
+
 $totalQuery = Database::search("SELECT COUNT(*) AS `total` FROM `announcements`");
 $totalResult = $totalQuery->fetch_assoc();
 $totalAnnouncements = $totalResult['total'];
@@ -46,7 +56,32 @@ $announcementsResult = Database::search($announcementsQuery);
             </div>
 
             <div class="row g-3" id="announcements-container">
+                
                 <?php
+                // 2. THIS IS THE MISSING XML DISPLAY LOOP
+                if (!empty($xmlAnnouncements)) {
+                    foreach ($xmlAnnouncements as $item) {
+                        ?>
+                        <div class="col-12">
+                            <div class="card border-2 border-dark rounded-4 shadow-sm bg-white p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="fw-bold mb-0">📌 <?php echo htmlspecialchars($item->title); ?> (XML Feed)</h5>
+                                    <?php if (!empty($item->date)): ?>
+                                        <span class="badge bg-warning text-dark border border-dark rounded-pill extra-small">
+                                            <?php echo htmlspecialchars($item->category); ?> - <?php echo htmlspecialchars($item->date); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <p class="text-muted mb-0 small"><?php echo nl2br(htmlspecialchars($item->content)); ?></p>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                }
+                ?>
+
+                <?php
+                // 3. YOUR ORIGINAL DATABASE DISPLAY LOOP
                 if ($announcementsResult && $announcementsResult->num_rows > 0) {
                     while ($announcement = $announcementsResult->fetch_assoc()) {
                         $title = !empty($announcement['title']) ? $announcement['title'] : 'Notice';
@@ -68,7 +103,8 @@ $announcementsResult = Database::search($announcementsQuery);
                         </div>
                         <?php
                     }
-                } else {
+                } elseif (empty($xmlAnnouncements)) {
+                    // Only show empty message if BOTH XML and DB are empty
                     ?>
                     <div class="col-12 text-center text-muted py-5">
                         No announcements posted yet.
